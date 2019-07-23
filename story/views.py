@@ -1,11 +1,17 @@
-from django.shortcuts import render
 from .models import Post
+from django.views.generic import (
+    ListView,
+    TemplateView
+)
 
 
-def home(request):
-    posts = Post.objects.all()
-    return render(request, 'story/home.html', {'posts': posts})
+class PostListView(ListView):
+    model = Post
+    template_name = 'story/home.html'  # <app>/<model>_<viewtype>.html
+    context_object_name = 'posts'
+    ordering = ['-date_posted']
+    paginate_by = 5
 
 
-def about(request):
-    return render(request, 'story/about.html')
+class AboutPageView(TemplateView):
+    template_name = 'story/about.html'
