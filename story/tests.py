@@ -156,3 +156,48 @@ class PostDetailViewTests(TestCase):
         self.assertEquals(expected_object_title, 'Hello')
         expected_object_content = f'{post.content}'
         self.assertEquals(expected_object_content, 'Hello, World')
+
+
+class PostUpdateViewTests(TestCase):
+
+    def setUp(self):
+        user = User.objects.create_user(username='mohit', email='mohit@sharestory.com', password='123')
+        Post.objects.create(title='Hello', content='Hello, World', author=user)
+        self.client.login(username='mohit', password='123')
+
+    def test_post_update_page_status_code_with_post(self):
+        response = self.client.get('/post/1/update/')
+        self.assertEquals(response.status_code, 200)
+
+    def test_update_view_url_by_name_with_post(self):
+        response = self.client.get(reverse('post-update', kwargs={'pk': 1}))
+        self.assertEquals(response.status_code, 200)
+
+    def test_post_update_page_status_code_without_post(self):
+        response = self.client.get('/post/99/update/')
+        self.assertEquals(response.status_code, 404)
+
+    def test_update_view_url_by_name_without_post(self):
+        response = self.client.get(reverse('post-update', kwargs={'pk': 99}))
+        self.assertEquals(response.status_code, 404)
+
+    def test_post_object(self):
+        post = Post.objects.get(id=1)
+        expected_object_title = f'{post.title}'
+        self.assertEquals(expected_object_title, 'Hello')
+        expected_object_content = f'{post.content}'
+        self.assertEquals(expected_object_content, 'Hello, World')
+
+    def test_create_post_with_valid_post_data(self):
+        data = {
+            'title': 'Test title',
+            'content': 'Test content'
+        }
+        self.client.post(reverse('post-update', kwargs={'pk': 1}), data)
+        self.assertTrue(Post.objects.exists())
+
+    def test_create_post_with_invalid_post_data(self):
+        response = self.client.post(reverse('post-update', kwargs={'pk': 1}), {})
+        form = response.context.get('form')
+        self.assertEquals(response.status_code, 200)
+        self.assertTrue(form.errors)
