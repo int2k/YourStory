@@ -121,3 +121,38 @@ class NewPostTests_After_Authentication(TestCase):
         response = self.client.post(reverse('post-create'), data)
         self.assertEquals(response.status_code, 200)
         self.assertFalse(Post.objects.exists())
+
+
+class PostDetailViewTests(TestCase):
+
+    def setUp(self):
+        user = User.objects.create_user(username='mohit', email='mohit@sharestory.com', password='123')
+        Post.objects.create(title='Hello', content='Hello, World', author=user)
+
+    def test_post_detail_page_status_code_with_post(self):
+        response = self.client.get('/post/1/')
+        self.assertEquals(response.status_code, 200)
+
+    def test_detail_view_uses_correct_template(self):
+        response = self.client.get(reverse('post-detail', kwargs={'pk': 1}))
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'story/post_detail.html')
+
+    def test_detail_view_url_by_name_with_post(self):
+        response = self.client.get(reverse('post-detail', kwargs={'pk': 1}))
+        self.assertEquals(response.status_code, 200)
+
+    def test_post_detail_page_status_code_without_post(self):
+        response = self.client.get('/post/99/')
+        self.assertEquals(response.status_code, 404)
+
+    def test_detail_view_url_by_name_without_post(self):
+        response = self.client.get(reverse('post-detail', kwargs={'pk': 99}))
+        self.assertEquals(response.status_code, 404)
+
+    def test_post_object(self):
+        post = Post.objects.get(id=1)
+        expected_object_title = f'{post.title}'
+        self.assertEquals(expected_object_title, 'Hello')
+        expected_object_content = f'{post.content}'
+        self.assertEquals(expected_object_content, 'Hello, World')
