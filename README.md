@@ -8,9 +8,11 @@ A story sharing platform using python Django framework where user can post a sto
 It is best to use the python `pipenv` tool to build locally:
 
 ```bash
+> git clone https://github.com/ifat-mohit/YourStory.git
+> cd YourStory/
 > pip install pipenv
 > pipenv sync
-> git clone https://github.com/ifat-mohit/YourStory.git
+
 ```
 ## Creating Database and Tables
 
@@ -19,7 +21,6 @@ You make migrations to the database, create a super user
 > python manage.py makemigrations
 > python manage.py migrate
 > python manage.py createsuperuser
-> python manage.py runserver
 ```
 
 ## Testing
